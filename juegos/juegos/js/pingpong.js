@@ -1,3 +1,32 @@
+// Variables para el puntaje
+var player1Score = 0;
+var player2Score = 0;
+
+// Obtener los elementos del marcador de puntaje
+var player1Scoreboard = document.getElementById("player1score");
+var player2Scoreboard = document.getElementById("player2score");
+
+// Función para actualizar el marcador de puntaje
+function updateScoreboard() {
+  player1Scoreboard.textContent = player1Score;
+  player2Scoreboard.textContent = player2Score;
+}
+
+// Función para detectar cuando se anota un punto
+function score(player) {
+  if (player === 1) {
+    player1Score++;
+  } else {
+    player2Score++;
+  }
+  updateScoreboard();
+}
+
+// Llamada a la función score cuando se anota un punto
+// Ejemplo: score(1) aumentará el puntaje del jugador 1
+// score(2) aumentará el puntaje del jugador 2
+
+
 const canvas = document.getElementById('game');
 const context = canvas.getContext('2d');
 const grid = 15;
