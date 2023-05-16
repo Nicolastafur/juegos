@@ -1,0 +1,56 @@
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: black;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+canvas {
+  border: 1px solid white;
+}
+
+#preview {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: center;
+  background-color: #000;
+}
+.preview-cell {
+  width: 20px;
+  height: 20px;
+  margin: 2px;
+  border: 1px solid #000;
+  box-sizing: border-box;
+}
+#puntaje {
+  font-size: 36px;
+  position: absolute;
+  top: 0;
+  right: 0;
+  font-weight: bold;
+  color: #333;
+  margin-top: 10px;
+  margin-right: -500px;
+  margin-bottom: 10px;
+}
+#high-score-value {
+  font-size: 36px;
+  position: absolute;
+  top: 0;
+  right: 0;
+  font-weight: bold;
+  color: #333;
+  margin-top: 10px;
+  margin-right: -500px;
+  margin-bottom: 10px;
+}
+#nivel {
+  font-size: 20px;
+  color: #555;
+  margin-bottom: 5px;
+}
