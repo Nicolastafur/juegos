@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>El Ahorcado</title>
+    <script type="text/javascript" src="ahorcado.js"></script>
+    <link rel="stylesheet" href="style.min.css">
+    <link rel="stylesheet" href="animate.min.css">
+</head>
+<body>
+    <div id="aviso" class="animated fadeInDown">
+        <section>
+            <h1 id="aviso-titulo">Felicidades Ganaste!!!</h1>
+            <hr>
+            <a href="#newgame" id="aviso-btn" class="btn-game">Volver A Jugar</a>
+        </section>
+    </div>
+    <div id="top">
+        <h1>Juego El Ahorcado</h1>
+        <a href="https://github.com/Nelkit/elAhorcadoJuegoJS" target="_blank" class="btn-github">Ver Codigo Fuente</a>
+        <hr>
+        <h4>Desarrollado por Nelkit Chávez en Clase de Programación Básica en <a href="http://mejorando.la" target="_blank">Mejorando.la</a></h4>
+    </div>
+    <div id="form-letras">
+        <span>Escribe una Letra: </span>
+        <input type="text" maxlength="1" id="letra" value="">
+        <a href="#" id="btn-aceptar" class="animated bounceIn">✓</a>
+    </div>
+    <div id="wrapper">
+        <canvas  class="cols" id="lienzo"></canvas>
+        <section class="cols" >
+            <h6>Caracteres ya Usados o No Permitidos</h6>
+            <div id="letras-usadas">
+            </div>
+        </section>
+    </div>
+    <div id="advertencias" class="animated fadeInLeft">
+        Ingrese un caracter valido / que no haya sido ingresado
+    </div>
+    <script>
+        iniciar();
+    </script>
+</body>
+</html>
