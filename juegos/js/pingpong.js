@@ -1,202 +1,219 @@
-// Variables para el puntaje
-var player1Score = 0;
-var player2Score = 0;
-
-// Obtener los elementos del marcador de puntaje
-var player1Scoreboard = document.getElementById("player1score");
-var player2Scoreboard = document.getElementById("player2score");
-
-// Función para actualizar el marcador de puntaje
-function updateScoreboard() {
-  player1Scoreboard.textContent = player1Score;
-  player2Scoreboard.textContent = player2Score;
-}
-
-// Función para detectar cuando se anota un punto
-function score(player) {
-  if (player === 1) {
-    player1Score++;
-  } else {
-    player2Score++;
-  }
-  updateScoreboard();
-}
-
-// Llamada a la función score cuando se anota un punto
-// Ejemplo: score(1) aumentará el puntaje del jugador 1
-// score(2) aumentará el puntaje del jugador 2
-
-
-const canvas = document.getElementById('game');
-const context = canvas.getContext('2d');
-const grid = 15;
-const paddleHeight = grid * 5; // 80
-const maxPaddleY = canvas.height - grid - paddleHeight;
-
-var paddleSpeed = 6;
-var ballSpeed = 5;
-
-const leftPaddle = {
-  // start in the middle of the game on the left side
-  x: grid * 2,
-  y: canvas.height / 2 - paddleHeight / 2,
-  width: grid,
-  height: paddleHeight,
-
-  // paddle velocity
-  dy: 0
-};
-const rightPaddle = {
-  // start in the middle of the game on the right side
-  x: canvas.width - grid * 3,
-  y: canvas.height / 2 - paddleHeight / 2,
-  width: grid,
-  height: paddleHeight,
-
-  // paddle velocity
-  dy: 0
-};
-const ball = {
-  // start in the middle of the game
-  x: canvas.width / 2,
-  y: canvas.height / 2,
-  width: grid,
-  height: grid,
-
-  // keep track of when need to reset the ball position
-  resetting: false,
-
-  // ball velocity (start going to the top-right corner)
-  dx: ballSpeed,
-  dy: -ballSpeed
-};
-
-// check for collision between two objects using axis-aligned bounding box (AABB)
-// @see https://developer.mozilla.org/en-US/docs/Games/Techniques/2D_collision_detection
-function collides(obj1, obj2) {
-  return obj1.x < obj2.x + obj2.width &&
-         obj1.x + obj1.width > obj2.x &&
-         obj1.y < obj2.y + obj2.height &&
-         obj1.y + obj1.height > obj2.y;
-}
-
-// game loop
-function loop() {
-  requestAnimationFrame(loop);
-  context.clearRect(0,0,canvas.width,canvas.height);
-
-  // move paddles by their velocity
-  leftPaddle.y += leftPaddle.dy;
-  rightPaddle.y += rightPaddle.dy;
-
-  // prevent paddles from going through walls
-  if (leftPaddle.y < grid) {
-    leftPaddle.y = grid;
-  }
-  else if (leftPaddle.y > maxPaddleY) {
-    leftPaddle.y = maxPaddleY;
-  }
-
-  if (rightPaddle.y < grid) {
-    rightPaddle.y = grid;
-  }
-  else if (rightPaddle.y > maxPaddleY) {
-    rightPaddle.y = maxPaddleY;
-  }
-
-  // draw paddles
-  context.fillStyle = 'white';
-  context.fillRect(leftPaddle.x, leftPaddle.y, leftPaddle.width, leftPaddle.height);
-  context.fillRect(rightPaddle.x, rightPaddle.y, rightPaddle.width, rightPaddle.height);
-
-  // move ball by its velocity
-  ball.x += ball.dx;
-  ball.y += ball.dy;
-
-  // prevent ball from going through walls by changing its velocity
-  if (ball.y < grid) {
-    ball.y = grid;
-    ball.dy *= -1;
-  }
-  else if (ball.y + grid > canvas.height - grid) {
-    ball.y = canvas.height - grid * 2;
-    ball.dy *= -1;
-  }
-
-  // reset ball if it goes past paddle (but only if we haven't already done so)
-  if ( (ball.x < 0 || ball.x > canvas.width) && !ball.resetting) {
-    ball.resetting = true;
-
-    // give some time for the player to recover before launching the ball again
-    setTimeout(() => {
-      ball.resetting = false;
-      ball.x = canvas.width / 2;
-      ball.y = canvas.height / 2;
-    }, 400);
-  }
-
-  // check to see if ball collides with paddle. if they do change x velocity
-  if (collides(ball, leftPaddle)) {
-    ball.dx *= -1;
-
-    // move ball next to the paddle otherwise the collision will happen again
-    // in the next frame
-    ball.x = leftPaddle.x + leftPaddle.width;
-  }
-  else if (collides(ball, rightPaddle)) {
-    ball.dx *= -1;
-
-    // move ball next to the paddle otherwise the collision will happen again
-    // in the next frame
-    ball.x = rightPaddle.x - ball.width;
-  }
-
-  // draw ball
-  context.fillRect(ball.x, ball.y, ball.width, ball.height);
-
-  // draw walls
-  context.fillStyle = 'lightgrey';
-  context.fillRect(0, 0, canvas.width, grid);
-  context.fillRect(0, canvas.height - grid, canvas.width, canvas.height);
-
-  // draw dotted line down the middle
-  for (let i = grid; i < canvas.height - grid; i += grid * 2) {
-    context.fillRect(canvas.width / 2 - grid / 2, i, grid, grid);
-  }
-}
-
-// listen to keyboard events to move the paddles
-document.addEventListener('keydown', function(e) {
-
-  // up arrow key
-  if (e.which === 38) {
-    rightPaddle.dy = -paddleSpeed;
-  }
-  // down arrow key
-  else if (e.which === 40) {
-    rightPaddle.dy = paddleSpeed;
-  }
-
-  // w key
-  if (e.which === 87) {
-    leftPaddle.dy = -paddleSpeed;
-  }
-  // a key
-  else if (e.which === 83) {
-    leftPaddle.dy = paddleSpeed;
-  }
-});
-
-// listen to keyboard events to stop the paddle if key is released
-document.addEventListener('keyup', function(e) {
-  if (e.which === 38 || e.which === 40) {
-    rightPaddle.dy = 0;
-  }
-
-  if (e.which === 83 || e.which === 87) {
-    leftPaddle.dy = 0;
-  }
-});
-
-// start the game
-requestAnimationFrame(loop);
+canvas = document.getElementById('game')
+    ctx = canvas.getContext('2d')
+	
+    var game = new function() {
+		this.time = 0
+        this.width = canvas.width
+        this.height = canvas.height
+        this.color = "#ddd"
+        this.players = []
+		this.balls = []
+		this.particles = []
+        this.update = function(){
+            for (var i in game.players) {
+                game.players[i].update()
+            }
+			for (var i in game.particles) {
+				game.particles[i].update()
+            }
+			if (game.time>350) {
+				for (var i in game.balls) {
+					game.balls[i].update()
+				}
+			}
+			game.time++
+        }
+        this.draw = function(){
+			ctx.clearRect(0,0,game.width,game.height)
+			ctx.fillStyle = 'rgba(0,0,0,0.1)'
+			ctx.font = '300px helvetica'
+			ctx.textBaseline = 'middle'
+			ctx.textAlign = 'center'
+			ctx.fillText(game.players[0].score,game.width/3,game.height/2)
+			ctx.fillText(game.players[1].score,2*game.width/3,game.height/2)
+            for (var i in game.players) {
+                game.players[i].draw()
+            }
+			for (var i in game.particles) {
+                game.particles[i].draw()
+            }
+			if (game.time>350 | game.time%100>50) {
+				for (var i in game.balls) {
+					game.balls[i].draw()
+				}
+			}
+        }
+        this.init = function(){
+			document.addEventListener('keydown',game.keyDownHandeler)
+			document.addEventListener('keyup',game.keyUpHandeler)
+            setInterval(game.update,10)
+            setInterval(game.draw,17)
+			this.players.push(new Player(15,game.height/2,100,10,87,83,6,game.color,true,8))
+			this.players.push(new Player(game.width-15,game.height/2,100,10,38,40,6,game.color,false,30))
+			this.balls.push(new Ball(game.width/2,game.height/2,(Math.random()>0.5)?-4:4,((Math.random()>0.5)?-1:1)*(Math.random()*0.2+0.4),10,0.1,game.color))
+        }
+		this.keyDownHandeler = function(e){
+			for (var i in game.players) {
+				switch(e.keyCode){
+					case game.players[i].keyUp:
+						game.players[i].up = true
+					break
+					case game.players[i].keyDown:
+						game.players[i].down = true
+					break
+				}	
+			}
+		}
+		this.keyUpHandeler = function(e){
+			for (var i in game.players) {
+				switch(e.keyCode){
+					case game.players[i].keyUp:
+						game.players[i].up = false
+					break
+					case game.players[i].keyDown:
+						game.players[i].down = false
+					break
+				}	
+			}
+		}
+		this.newRound = function(){
+			this.time = 0
+			this.balls = []
+			this.balls.push(new Ball(game.width/2,game.height/2,(game.players[0].score>game.players[1].score)?-4:4,((Math.random()>0.5)?-1:1)*(Math.random()*0.2+0.4),10,0.1,game.color))
+		}
+    }
+    
+    function Ball(x,y,xSpeed,ySpeed,size,acc,color) {
+        this.x = x
+        this.y = y
+        this.xSpeed = xSpeed
+        this.ySpeed = ySpeed
+        this.size = size
+		this.acc = acc
+		this.maxAng = 0.8
+        this.color = color
+		this.particleCount = 20
+		this.trail = []
+		this.trailLength = 10
+        this.update = function(){
+			this.x += this.xSpeed
+			var testY = this.y+this.ySpeed
+            if (testY<this.size) {
+				this.y = this.size
+				this.ySpeed *= -1
+			}else if (testY>game.height-this.size) {
+				this.y = game.height-this.size
+				this.ySpeed *= -1
+			}else{
+				this.y = testY
+			}
+			for (var i in game.players) {
+				var player = game.players[i]
+				var dir = this.xSpeed>0 ? 1 : -1
+				if (this.x+this.size/2>player.x-player.width/2 & this.x-this.size/2<player.x+player.width/2 & this.y+this.size/2>player.y-player.height/2 & this.y-this.size/2<player.y+player.height/2) {
+					this.x = dir>0 ? player.x-player.width/2-this.size/2 : player.x+player.width/2+this.size/2
+					var speed = Math.sqrt(Math.pow(this.ySpeed,2)+Math.pow(this.xSpeed,2)) + acc
+					var angle = this.maxAng*(this.y-player.y)/(player.height+this.size)
+					this.ySpeed = Math.sin(angle*Math.PI)*speed
+					this.xSpeed = -dir*Math.cos(angle*Math.PI)*speed
+					for (var i=0; i<this.particleCount; i++) {
+						game.particles.push(new Particle(this.x+dir*this.size/2,this.y,6,"rgba(255,255,255,"+0.06*Math.abs(this.xSpeed)+")",-dir*(Math.random()*3+1),Math.random()*8-4,10))
+					}
+				}
+				this.trail.unshift([this.x,this.y])
+				if (this.trail.length>this.trailLength) {
+					this.trail.pop()
+				}
+			}
+			if (this.x+this.size/2<0) {
+				game.players[1].score += 1
+				game.newRound()
+			}
+			if (this.x-this.size/2>game.width) {
+				game.players[0].score += 1
+				game.newRound()
+			}
+        }
+        this.draw = function(){
+			for (var i in this.trail) {
+				ctx.fillStyle = 'rgba(255,255,255,'+0.5/i+')'
+				ctx.fillRect(this.trail[i][0]-this.size/2,this.trail[i][1]-this.size/2,this.size,this.size)
+			}
+            ctx.fillStyle = this.color
+            ctx.fillRect(this.x-this.size/2,this.y-this.size/2,this.size,this.size)
+		}
+    }
+	
+	function Player(x,y,height,width,keyUp,keyDown,speed,color,ai,z){
+		this.x = x
+		this.y = y
+		this.height = height
+		this.width = width
+		this.color = color
+		this.score = 0
+		this.up = false
+		this.down = false
+		this.keyUp = keyUp
+		this.keyDown = keyDown
+		this.speed = speed
+		this.enableAi = ai
+		this.z = z
+		this.ai = function(){
+			if (Math.abs(this.x-game.balls[0].x-game.balls[0].xSpeed)<Math.abs(this.x-game.balls[0].x)) {
+				var yd = game.balls[0].y-this.y+game.balls[0].ySpeed*z
+				var s = yd/20
+				this.y = (s<this.speed) ? this.y+s : this.y+this.speed
+			}
+		}
+        this.update = function(){
+			if(this.enableAi==true){
+				this.ai()
+			}else{
+				if (this.up) {
+					var testY = this.y-this.speed
+					this.y = (testY-this.height/2>0) ? testY : this.height/2
+				}
+				if (this.down) {
+					var testY = this.y+this.speed
+					this.y = (testY+this.height/2<game.height) ? testY : game.height-this.height/2
+				}
+			}
+        }
+        this.draw = function(){
+            ctx.fillStyle = this.color
+            ctx.fillRect(this.x-this.width/2,this.y-this.height/2,this.width,this.height)
+        }
+	}
+	
+	function Particle(x,y,size,rgba,xSpeed,ySpeed,trailLength){
+		this.x = x
+		this.y = y
+		this.size = size
+		this.color = rgba
+		this.xSpeed = xSpeed
+		this.ySpeed = ySpeed
+		this.trail = []
+		this.time = 0
+		this.trailLength = trailLength
+        this.update = function(){
+			this.trail.push([this.x,this.y])
+			this.x += this.xSpeed
+			this.y += this.ySpeed
+			if (this.trail.length > this.trailLength) {
+				this.trail.shift()
+			}
+			this.time++
+        }
+        this.draw = function(){
+			var colorSplit = this.color.split(',')
+			for (var i in this.trail) {
+				var opacity = parseFloat(colorSplit[3])*i/(this.trailLength+this.time*this.time)
+				ctx.fillStyle = colorSplit[0]+","+colorSplit[1]+","+colorSplit[2]+","+opacity+")"
+				ctx.fillRect(this.trail[i][0]-this.size/2,this.trail[i][1]-this.size/2,this.size,this.size)		
+			}
+		}
+		if (game.particles.length>20) {
+			game.particles.shift()
+		}
+	}
+	game.init()
